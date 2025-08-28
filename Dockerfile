@@ -2,6 +2,7 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
+RUN pip install --upgrade pip setuptools wheel
 COPY requirements.txt .
 
 RUN apt-get update && apt-get install -y build-essential libgl1-mesa-glx && rm -rf /var/lib/apt/lists/*
