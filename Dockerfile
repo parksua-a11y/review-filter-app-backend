@@ -1,15 +1,9 @@
-FROM python:3.11-slim
+FROM tensorflow/tensorflow:2.13.0-gpu-python3.11
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
-    build-essential \
     libgl1-mesa-glx \
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev \
-    zlib1g-dev \
-    libwebp-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
