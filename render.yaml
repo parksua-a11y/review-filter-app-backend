@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: my-flask-app   # 👉 Render 대시보드에서 쓰는 서비스 이름으로 바꾸세요
+    name: review-filter-app-backend   # 👉 Render 대시보드에서 쓰는 서비스 이름으로 바꾸세요
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
