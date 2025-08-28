@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: review-filter-app
+    env: python
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: PIP_VERSION
+        value: 23.3.2
