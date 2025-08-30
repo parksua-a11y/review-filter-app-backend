@@ -27,5 +27,6 @@ COPY . .
 # 컨테이너 포트 설정
 EXPOSE 8000
 
-# gunicorn 실행 명령어를 파이썬 실행 스크립트로 명확하게 지정
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+# Gunicorn 실행 명령어
+# 파이썬 인터프리터를 명시적으로 지정하여 환경 충돌 방지
+CMD ["python3", "-m", "gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
