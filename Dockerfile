@@ -31,5 +31,5 @@ COPY . .
 EXPOSE 8000
 
 # Gunicorn 실행 명령어
-# 파이썬 인터프리터를 명시적으로 지정하여 환경 충돌 방지
-CMD ["python3", "-m", "gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+# 타임아웃을 120초로 늘려 모델 로딩 시간을 확보
+CMD ["python3", "-m", "gunicorn", "--bind", "0.0.0.0:8000", "--timeout", "120", "app:app"]
