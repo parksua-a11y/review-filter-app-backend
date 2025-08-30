@@ -29,7 +29,7 @@ app = Flask(__name__)
 CORS(app) # CORS 활성화
 
 # --- 환경변수에서 API 키 가져오기 (보안 개선) ---
-client_id = os.environ.get('NAVER_CLIENT_ID', 'jIlHrqsB4tITPcH7Syv2´)
+client_id = os.environ.get('NAVER_CLIENT_ID', 'jIlHrqsB4tITPcH7Syv2')
 client_secret = os.environ.get('NAVER_CLIENT_SECRET', 'utp07FFo8h')
 
 # --- OCR 리더 초기화 (조건부) ---
