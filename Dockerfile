@@ -6,7 +6,8 @@ WORKDIR /app
 # opencv, tensorflow, easyocr을 위한 핵심 종속성
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libgl1-mesa-glx \
+    libgl1 \
+    libglib2.0-0 \
     libjpeg-dev \
     libpng-dev \
     libtiff-dev \
