@@ -2,8 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# 빌드에 필요한 모든 시스템 라이브러리 설치
-# opencv, tensorflow, easyocr을 위한 핵심 종속성
+# OpenCV, EasyOCR 및 기타 종속성에 필요한 시스템 라이브러리 설치
 RUN apt-get update && apt-get install -y \
     build-essential \
     libgl1 \
@@ -15,6 +14,9 @@ RUN apt-get update && apt-get install -y \
     libwebp-dev \
     tesseract-ocr \
     libleptonica-dev \
+    libsm6 \
+    libxrender1 \
+    libfontconfig1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
