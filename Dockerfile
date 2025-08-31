@@ -2,34 +2,38 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# OpenCV, EasyOCR 및 기타 종속성에 필요한 시스템 라이브러리 설치
+# 웹 드라이버와 폰트를 위한 필수 패키지 설치
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libgl1 \
-    libglib2.0-0 \
+    libgl1-mesa-glx \
     libjpeg-dev \
     libpng-dev \
     libtiff-dev \
     zlib1g-dev \
     libwebp-dev \
-    tesseract-ocr \
-    libleptonica-dev \
+    libnss3 \
+    libgconf-2-4 \
+    libxi6 \
     libsm6 \
     libxrender1 \
     libfontconfig1 \
+    fonts-liberation \
+    libappindicator1 \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
+
+# Google Chrome 설치
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable
 
 COPY requirements.txt .
 
-# requirements.txt 파일에 명시된 패키지 설치
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 애플리케이션 코드 복사
 COPY . .
 
-# 컨테이너 포트 설정
 EXPOSE 8000
 
-# Gunicorn 실행 명령어
-# 타임아웃을 120초로 늘려 모델 로딩 시간을 확보
-CMD ["python3", "-m", "gunicorn", "--bind", "0.0.0.0:8000", "--timeout", "120", "app:app"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]

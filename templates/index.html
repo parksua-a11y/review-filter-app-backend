@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>리뷰의 본질을 찾다</title>
     <style>
-        /* 기존 CSS 그대로 복사 */
         @import url('https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.3.9/static/pretendard.css');
 
         .pretendard {
@@ -155,6 +154,7 @@
             color: #2DB400;
             font-size: 14px;
             font-weight: 300;
+            cursor: pointer;
         }
         .search__tags a:hover {
             opacity: 0.8;
@@ -162,11 +162,12 @@
 
         #mainContent2 {}
         .main__inner2 {
-            height: 1700px;
+            min-height: 1700px;
             background-color: #1a1a1a;
             color: #fafaf8;
             padding: 0 72px;
         }
+        
         .loading__section {
             background-color: #1a1a1a;
             display: none;
@@ -186,6 +187,33 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .error__section {
+            background-color: #1a1a1a;
+            display: none;
+            text-align: center;
+            padding: 200px 0;
+            color: #fafaf8;
+        }
+        
+        .error__text {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .retry__button {
+            background: #2DB400;
+            color: #1a1a1a;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .retry__button:hover {
+            opacity: 0.8;
         }
 
         .blog__card {
@@ -213,6 +241,10 @@
         .blog__sponsor {
             color: #2DB400;
             font-size: 13px;
+        }
+        
+        .blog__sponsor.sponsored {
+            color: #ff6b6b;
         }
         
         .blog__date {
@@ -289,6 +321,7 @@
         }
         .pagination-bar a {
             font-weight: 400;
+            cursor: pointer;
         }
         .pagination-bar a.active, .pagination-bar a:hover {
             color: #2DB400;
@@ -363,7 +396,8 @@
                 </ul>
             </nav>
             <div class="search__box">
-                <form id="searchForm"> <span class="search__label">NAVER</span>
+                <form id="searchForm">
+                    <span class="search__label">NAVER</span>
                     <span class="divider"></span>
                     <input id="searchInput" type="text" name="query" placeholder="분석할 키워드를 입력하세요.">
                     <button class="summit" type="submit">
@@ -386,21 +420,21 @@
     
         <main id="mainContent2" class="main__wrap pretendard">
             <div class="main__inner2" id="resultsMainInner">
-                <div id="loadingSection" class="loading__section" style="display: none;">
+                <div id="loadingSection" class="loading__section">
                     <div class="loading__spinner"></div>
                     <div class="loading__text">로딩중</div>
                 </div>
-                <div id="errorSection" class="error__section" style="display: none;">
+                <div id="errorSection" class="error__section">
                     <div class="error__text" id="errorText">검색 중 오류가 발생했습니다.</div>
                     <button class="retry__button" onclick="retrySearch()">다시 시도</button>
                 </div>
-                <div id="resultsSection" class="results__section" style="display: none;">
+                <div id="resultsSection" class="results__section">
                     <div class="results__summary" id="resultsSummary">
                         <div class="results__stats"></div>
                     </div>
                     <div id="blogGrid"></div>
                 </div>
-               <footer id="footer" style="display: none;">
+               <footer id="footer">
                     <div class="bottom__bar">
                         <form id="footerSearchForm" class="footer__search-bar">
                             <input id="footerSearchInput" type="text" name="query" placeholder="검색어를 입력하세요.">
@@ -413,13 +447,13 @@
                             </button>
                         </form>
                         <div id="pagination" class="pagination-bar"></div>
-                           <div class="checkbox-container">
-                                <input type="checkbox" id="includeSponsoredCheckbox">
-                                <label for="includeSponsoredCheckbox">
-                                    <span class="custom-checkbox"></span>
-                                    협찬글 포함
-                                </label>
-                            </div>
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="includeSponsoredCheckbox">
+                            <label for="includeSponsoredCheckbox">
+                                <span class="custom-checkbox"></span>
+                                협찬글 포함
+                            </label>
+                        </div>
                     </div>
                 </footer>
             </div>
@@ -430,6 +464,7 @@
         let currentSearchKeyword = '';
         let currentPage = 1;
         let includeSponsored = false;
+        let totalPages = 1;
         
         function showSection(sectionId) {
             document.getElementById('searchMainInner').style.display = 'none';
@@ -450,9 +485,9 @@
             }
         }
 
-        // 태그 클릭 검색 함수 추가
         function searchTag(keyword) {
             document.getElementById('searchInput').value = keyword;
+            document.getElementById('footerSearchInput').value = keyword;
             currentPage = 1;
             includeSponsored = false;
             document.getElementById('includeSponsoredCheckbox').checked = false;
@@ -481,6 +516,7 @@
             if (keyword) {
                 currentPage = 1;
                 includeSponsored = document.getElementById('includeSponsoredCheckbox').checked;
+                document.getElementById('searchInput').value = keyword;
                 performSearch(keyword, currentPage, includeSponsored);
             }
         });
@@ -488,7 +524,9 @@
         document.getElementById('includeSponsoredCheckbox').addEventListener('change', function(e) {
             includeSponsored = e.target.checked;
             currentPage = 1;
-            performSearch(currentSearchKeyword, currentPage, includeSponsored);
+            if (currentSearchKeyword) {
+                performSearch(currentSearchKeyword, currentPage, includeSponsored);
+            }
         });
 
         async function performSearch(keyword, page, includeSponsored) {
@@ -505,6 +543,10 @@
                         includeSponsored: includeSponsored
                     })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`서버 응답 오류: ${response.status}`);
+                }
                 
                 const data = await response.json();
                 
@@ -526,53 +568,15 @@
             const blogGrid = document.getElementById('blogGrid');
             blogGrid.innerHTML = '';
             
+            // 페이지 정보 업데이트
+            currentPage = data.current_page || 1;
+            totalPages = data.total_pages || 1;
+            
             const resultsSummary = document.getElementById('resultsSummary');
             resultsSummary.innerHTML = `
                 <div class="results__stats">
-                    총 검색된 게시물: ${data.total_posts || 0}개 | 필터링된 협찬글: ${data.sponsored_count || 0}개
+                    총 검색된 게시물: ${data.total_posts || 0}개 | 협찬글: ${data.sponsored_count || 0}개 | 현재 ${currentPage}/${totalPages} 페이지
                 </div>
             `;
 
-            if (data.results && data.results.length > 0) {
-                data.results.forEach(blog => {
-                    const sponsorLabel = (!blog.is_sponsored) ?
-                        `<span class="blog__sponsor">[비협찬글]</span>` :
-                        `<span class="blog__sponsor" style="color: #ff6b6b;">[협찬글]</span>`;
-                    
-                    const blogCard = document.createElement('div');
-                    blogCard.className = 'blog__card';
-                    blogCard.innerHTML = `
-                        <div class="blog__header">
-                            <div class="blog__meta">
-                                <span class="blog__author">${blog.author || '네이버 블로거'}</span>
-                                ${sponsorLabel}
-                            </div>
-                        </div>
-                        <h3 class="blog__title">${blog.title}</h3>
-                        <a href="${blog.url}" target="_blank" class="blog__link">
-                            ${blog.url}
-                        </a>
-                        <hr class="blog__divider" />
-                    `;
-                    blogGrid.appendChild(blogCard);
-                });
-            } else {
-                showError('검색 결과가 없습니다.');
-            }
-        }
-
-        function showError(message) {
-            showSection('errorSection');
-            document.getElementById('errorText').textContent = message;
-        }
-
-        function retrySearch() {
-            if (currentSearchKeyword) {
-                performSearch(currentSearchKeyword, currentPage, includeSponsored);
-            } else {
-                showSection('searchMainInner');
-            }
-        }
-    </script>
-</body>
-</html>
+            if
