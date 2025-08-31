@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리뷰의 본질을 찾다</title>
+    <style>
+        /* 기존 CSS 그대로 유지 */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.3.9/static/pretendard.css');
+
+        .pretendard {
+            font-family: 'Pretendard';
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        a {
+            text-decoration: none;
+            color: #fafaf8;
+        }
+        li {
+            list-style: none;
+        }
+
+        #headerType {}
+        .header__inner {
+            height: 89px;
+            background-color: #1a1a1a;
+            color: #fafaf8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 72px;
+            border-bottom: 0.5px solid #686868;
+        }
+        .header__menu {
+            font-size: 24;
+            font-weight: 400;
+        }
+        .header__menu ul li {
+            display: inline;
+        }
+        .header__menu ul li a{
+            padding: 0 72px;
+        }
+        .header__menu ul li :hover {
+            opacity: 0.8;
+        }
+        .header__plus {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 72px;
+        }
+        .header__plus img {
+            width: 24px;
+            height: 24px;
+            color: #fafaf8;
+            object-fit: contain;
+        }
+        .header__plus:hover img {
+            opacity: 0.8;
+        }
+
+        #mainContent {}
+        .main__inner {
+            height: 1700px;
+            background-color: #1a1a1a;
+            color: #fafaf8;
+        }
+        .main__title {
+            font-size: 83px;
+            font-weight: 700;
+            text-align: center;
+            padding-top: 280px;
+            padding-bottom: 72px;
+        }
+        .main__title .highlight {
+            color: #2DB400;
+        }
+        .main__serTitle {
+            font-size: 33px;
+            font-weight: 100;
+            text-align: center;
+        }
+        .main__serTitle ul li {
+            margin-bottom: 50px;
+        }
+        .main__serTitle ul li:last-child {
+            margin-bottom: 0;
+        }
+        .search__box {
+            margin-top: 330px;
+            text-align: center;
+        }
+        .search__box form {
+            display: flex;
+            align-items: center;
+            background: #fafaf8;
+            border-radius: 600px;
+            overflow: hidden;
+            width: 1000px;
+            height: 50px;
+            margin: 0 auto;
+            padding: 10px 30px;
+        }
+        .search__label {
+            background: #fafaf8;
+            color: #2DB400;
+            font-weight: bold;
+            font-size: 18px;
+            padding-right: 36px;
+            padding-left: 6px;
+        }
+        .divider {
+            width: 0.8px;
+            height: 24px;
+            background: #686868;
+        }
+        .search__box input {
+            background: #fafaf8;
+            flex: 1;
+            padding-left: 36px;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            font-weight: regular;
+            color: #686868;
+        }
+        .summit {
+            all: unset;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-right: 6px;
+        }
+        .summit img {
+            width: 32px;
+            height: 32px;
+            color: #686868;
+            object-fit: contain;
+        }
+        .summit:hover img {
+            opacity: 0.8;
+        }
+        .search__tags {
+            margin-top: 57px;
+            text-align: center;
+        }
+        .search__tags a {
+            margin: 0 24px;
+            color: #2DB400;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        .search__tags a:hover {
+            opacity: 0.8;
+        }
+
+        #mainContent2 {}
+        .main__inner2 {
+            height: 1700px;
+            background-color: #1a1a1a;
+            color: #fafaf8;
+            padding: 0 72px;
+        }
+        .loading__section {
+            background-color: #1a1a1a;
+            display: none;
+            text-align: center;
+            padding: 300px 0;
+        }
+        .loading__spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #686868;
+            border-top: 3px solid #2DB400;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .blog__card {
+            padding: 72px 200px 0 200px;
+            background: #1a1a1a;
+            color: #fafaf8;
+        }
+        
+        .blog__header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .blog__meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .blog__sponsor {
+            color: #2DB400;
+            font-size: 13px;
+            margin-left: auto;
+        }
+        
+        .blog__date {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .blog__author {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fafaf8;
+        }
+
+        .blog__title {
+            font-weight: bold;
+            margin: 12px 0 6px 0;
+        }
+
+        .blog__link {
+            color: #9cf;
+            text-decoration: underline;
+            font-size: 14px;
+        }
+
+        .blog__divider {
+            margin-top: 10px;
+            border: none;
+            border-bottom: 1px solid #444;
+        }
+
+        .results__summary {
+            padding: 40px 200px 40px 200px;
+            color: #fafaf8;
+            font-size: 16px;
+        }
+        
+        .bottom__bar {
+            width: 100%;
+            margin: 72px 150px 0 150px;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            gap: 200px;
+        }
+        .footer__search-bar {
+            display: flex;
+            align-items: center;
+            background: #252525;
+            justify-content:space-between;
+            border-radius: 600px;
+            overflow: hidden;
+            width: 230px;
+            padding: 8px 20px;
+        }
+        .footer__search-bar input {
+            background: #252525;
+            border: none;
+            outline: none;
+            font-size: 12px;
+            font-weight: 300;
+            width: 160px;
+            color: #fafaf8;
+        }
+        .footer__search-bar .summit img {
+            width: 24px;
+            height: 24px;
+        }
+        .pagination-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            color: #fafaf8;
+        }
+        .pagination-bar a {
+            font-weight: 400;
+        }
+        .pagination-bar a.active, .pagination-bar a:hover {
+            color: #2DB400;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-container input[type="checkbox"] {
+            display: none; 
+        }
+        .checkbox-container label {
+            display: flex; 
+            align-items: center; 
+            color: #fafaf8; 
+            font-weight: 300; 
+            font-size: 12px; 
+            cursor: pointer;
+            gap: 8px;
+        }
+        .checkbox-container .custom-checkbox {
+            width: 14px;
+            height: 14px;
+            border: 0.8px solid #fafaf8;
+            border-radius: 3px;
+        }
+        .checkbox-container input[type="checkbox"]:checked + label .custom-checkbox {
+            background-color: #2DB400;
+            border-color: #2DB400;
+        }
+        .checkbox-container input[type="checkbox"]:checked + label .custom-checkbox::after {
+            content: '';
+            display: block;
+            width: 14px;
+            height: 14px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%231a1a1a" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/%3E%3C/svg%3E');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="headerType" class="hearder__wrap pretendard">
+        <div class="header__inner">
+            <nav class="header__menu">
+                <ul>
+                    <li><a href="#">공유하기</a></li>
+                    <li><a href="#">도움말</a></li>
+                </ul>
+            </nav>
+            <button class="header__plus">
+                <img
+                    class="relative w-6 h-6"
+                    alt="Menu"
+                    src="https://c.animaapp.com/xhioipVR/img/group-26@2x.png"
+                />
+            </button>
+        </div>
+    </header>
+    
+    <main id="mainContent" class="main__wrap pretendard">
+        <div class="main__inner" id="searchMainInner">
+            <h1 class="main__title">
+                <span class="highlight">리뷰의 본질</span>을 찾다
+            </h1>
+            <nav class="main__serTitle">
+                <ul>
+                    <li><a href="#">네이버 블로그에서 협찬·광고 글을 자동으로 제외합니다.</a></li>
+                    <li><a href="#">필터 한 번으로 투명한 리뷰를 만나보세요.</a></li>
+                </ul>
+            </nav>
+            <div class="search__box">
+                <form id="searchForm"> <span class="search__label">NAVER</span>
+                    <span class="divider"></span>
+                    <input id="searchInput" type="text" name="query" placeholder="분석할 키워드를 입력하세요.">
+                    <button class="summit" type="submit">
+                        <img
+                            class="relative w-6 h-6"
+                            alt="Search"
+                            src="https://c.animaapp.com/xhioipVR/img/group-28@2x.png"
+                        />
+                    </button>
+                </form>
+            </div>
+            <div class="search__tags">
+                <a href="#" onclick="searchTag('원주맛집')">#원주맛집</a>
+                <a href="#" onclick="searchTag('범계맛집')">#범계맛집</a>
+                <a href="#" onclick="searchTag('명탐정코난척안의잔상')">#명탐정코난척안의잔상</a>
+                <a href="#" onclick="searchTag('레몬수')">#레몬수</a>
+                <a href="#" onclick="searchTag('배홍동비빔면')">#배홍동비빔면</a>
+            </div>
+        </div>
+    
+        <main id="mainContent2" class="main__wrap pretendard">
+            <div class="main__inner2" id="resultsMainInner">
+                <div id="loadingSection" class="loading__section" style="display: none;">
+                    <div class="loading__spinner"></div>
+                    <div class="loading__text">로딩중...</div>
+                </div>
+                <div id="errorSection" class="error__section" style="display: none;">
+                    <div class="error__text" id="errorText">검색 중 오류가 발생했습니다.</div>
+                    <button class="retry__button" onclick="retrySearch()">다시 시도</button>
+                </div>
+                <div id="resultsSection" class="results__section" style="display: none;">
+                    <div class="results__summary" id="resultsSummary">
+                        <div class="results__stats"></div>
+                    </div>
+                    <div id="blogGrid"></div>
+                </div>
+               <footer id="footer" style="display: none;">
+                    <div class="bottom__bar">
+                        <form id="footerSearchForm" class="footer__search-bar">
+                            <input id="footerSearchInput" type="text" name="query" placeholder="검색어를 입력하세요.">
+                            <button class="summit" type="submit">
+                                <img
+                                    class="relative w-6 h-6"
+                                    alt="Search"
+                                    src="https://c.animaapp.com/xhioipVR/img/group-28@2x.png"
+                                />
+                            </button>
+                        </form>
+                        <div id="pagination" class="pagination-bar"></div>
+                           <div class="checkbox-container">
+                                <input type="checkbox" id="includeSponsoredCheckbox">
+                                <label for="includeSponsoredCheckbox">
+                                    <span class="custom-checkbox"></span>
+                                    협찬글 포함
+                                </label>
+                            </div>
+                    </div>
+                </footer>
+            </div>
+        </main>
+    </main>
+
+    <script>
+        let currentSearchKeyword = '';
+        let currentPage = 1;
+        let includeSponsored = false;
+        
+        // --- 화면 섹션 관리 함수 ---
+        function showSection(sectionId) {
+            document.getElementById('searchMainInner').style.display = 'none';
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('footer').style.display = 'none';
+
+            if (sectionId === 'searchMainInner') {
+                document.getElementById('searchMainInner').style.display = 'block';
+            } else if (sectionId === 'loadingSection') {
+                document.getElementById('loadingSection').style.display = 'block';
+            } else if (sectionId === 'errorSection') {
+                document.getElementById('errorSection').style.display = 'block';
+            } else if (sectionId === 'resultsSection') {
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('footer').style.display = 'flex';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('searchMainInner');
+        });
+
+        // 태그 클릭 검색 함수
+        function searchTag(keyword) {
+            document.getElementById('searchInput').value = keyword;
+            currentPage = 1;
+            includeSponsored = false;
+            document.getElementById('includeSponsoredCheckbox').checked = false;
+            performSearch(keyword, currentPage, includeSponsored);
+        }
+
+        // 상단 검색 폼 제출 이벤트
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const keyword = document.getElementById('searchInput').value.trim();
+            if (keyword) {
+                currentPage = 1;
+                includeSponsored = false;
+                document.getElementById('includeSponsoredCheckbox').checked = false;
+                document.getElementById('footerSearchInput').value = keyword;
+                performSearch(keyword, currentPage, includeSponsored);
+            }
+        });
+
+        // 하단 검색 폼 제출 이벤트
+        document.getElementById('footerSearchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const keyword = document.getElementById('footerSearchInput').value.trim();
+            if (keyword) {
+                currentPage = 1;
+                includeSponsored = document.getElementById('includeSponsoredCheckbox').checked;
+                performSearch(keyword, currentPage, includeSponsored);
+            }
+        });
+
+        // '협찬글 포함' 체크박스 변경 이벤트
+        document.getElementById('includeSponsoredCheckbox').addEventListener('change', function(e) {
+            includeSponsored = e.target.checked;
+            currentPage = 1;
+            performSearch(currentSearchKeyword, currentPage, includeSponsored);
+        });
+
+        // ✨ 실제 API를 호출하는 검색 함수
+        async function performSearch(keyword, page, includeSponsored) {
+            currentSearchKeyword = keyword;
+            
+            showSection('loadingSection');
+            
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        keyword: keyword,
+                        page: page,
+                        includeSponsored: includeSponsored
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayResults(data);
+                } else {
+                    showError(data.error || '검색 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                showError(`네트워크 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+
+        // 결과 표시 함수
+        function displayResults(data) {
+            showSection('resultsSection');
+            
+            const blogGrid = document.getElementById('blogGrid');
+            blogGrid.innerHTML = '';
+            
+            const resultsSummary = document.getElementById('resultsSummary');
+            resultsSummary.innerHTML = `
+                <div class="results__stats">
+                    총 검색된 게시물: ${data.results ? data.results.length : 0}개
+                    <br><small style="color: #2DB400; margin-top: 10px; display: block;">
+                        실제 네이버 블로그에서 검색된 결과입니다.
+                    </small>
+                </div>
+            `;
+
+            if (data.results && data.results.length > 0) {
+                data.results.forEach(blog => {
+                    const sponsorLabel = (!blog.is_sponsored) ?
+                        `<span class="blog__sponsor">[비협찬글]</span>` :
+                        `<span class="blog__sponsor" style="color: #ff6b6b;">[협찬글]</span>`;
+                    
+                    const blogCard = document.createElement('div');
+                    blogCard.className = 'blog__card';
+                    blogCard.innerHTML = `
+                        <div class="blog__header">
+                            <div class="blog__meta">
+                                <span class="blog__author">${blog.author || '네이버 블로거'}</span>
+                                ${sponsorLabel}
+                            </div>
+                        </div>
+                        <h3 class="blog__title">${blog.title}</h3>
+                        <a href="${blog.url}" target="_blank" class="blog__link">
+                            ${blog.url}
+                        </a>
+                        <hr class="blog__divider" />
+                    `;
+                    blogGrid.appendChild(blogCard);
+                });
+            } else {
+                showError('해당 키워드로 찾은 게시물이 없거나 모두 협찬 글입니다.');
+            }
+        }
+
+        // 에러 표시
+        function showError(message) {
+            showSection('errorSection');
+            document.getElementById('errorText').textContent = message;
+        }
+
+        // 재시도 버튼 클릭 시
+        function retrySearch() {
+            if (currentSearchKeyword) {
+                performSearch(currentSearchKeyword, currentPage, includeSponsored);
+            } else {
+                showSection('searchMainInner');
+            }
+        }
+    </script>
+</body>
+</html>
