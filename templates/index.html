@@ -562,21 +562,121 @@
             }
         }
 
-        function displayResults(data) {
+       function displayResults(data) {
+            // 결과 화면 표시
             showSection('resultsSection');
             
             const blogGrid = document.getElementById('blogGrid');
             blogGrid.innerHTML = '';
             
-            // 페이지 정보 업데이트
-            currentPage = data.current_page || 1;
-            totalPages = data.total_pages || 1;
-            
             const resultsSummary = document.getElementById('resultsSummary');
             resultsSummary.innerHTML = `
                 <div class="results__stats">
-                    총 검색된 게시물: ${data.total_posts || 0}개 | 협찬글: ${data.sponsored_count || 0}개 | 현재 ${currentPage}/${totalPages} 페이지
+                    총 검색된 게시물: ${data.total_posts}개 | 필터링된 게시물: ${data.filtered_count}개
                 </div>
             `;
 
-            if
+            if (data.results && data.results.length > 0) {
+                data.results.forEach(blog => {
+                    const sponsorLabel = (blog.is_sponsored === false) ?
+                        `<span class="blog__sponsor">[비협찬글]</span>` :
+                        '';
+                    
+                    const blogDate = blog.date ? `<span class="blog__date">${blog.date}</span>` : '';
+                    
+                    const blogCard = document.createElement('div');
+                    blogCard.className = 'blog__card';
+                    blogCard.innerHTML = `
+                        <div class="blog__header">
+                            <div class="blog__meta">
+                                <span class="blog__author">${blog.author || '네이버 블로거'}</span>
+                                ${sponsorLabel}
+                            </div>
+                            ${blogDate}
+                        </div>
+                        <h3 class="blog__title">${blog.title}</h3>
+                        <a href="${blog.url}" target="_blank" class="blog__link">
+                            ${blog.url}
+                        </a>
+                        <hr class="blog__divider" />
+                    `;
+                    blogGrid.appendChild(blogCard);
+                });
+            } else {
+                showError('해당 키워드로 찾은 게시물이 없거나 모두 협찬 글입니다.');
+            }
+
+            // 페이지네이션 업데이트
+            updatePagination(data.total_pages || 1);
+        }
+
+        // 페이지네이션 업데이트 함수
+        function updatePagination(totalPages) {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+
+            // '이전' 링크
+            if (currentPage > 1) {
+                const prevLink = document.createElement('a');
+                prevLink.textContent = '이전 <';
+                prevLink.href = '#';
+                prevLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    goToPage(currentPage - 1);
+                });
+                paginationContainer.appendChild(prevLink);
+            }
+
+            // 페이지 번호 링크
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            for (let i = startPage; i <= endPage; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.textContent = i;
+                pageLink.href = '#';
+                if (i === currentPage) {
+                    pageLink.classList.add('active');
+                }
+                pageLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    goToPage(i);
+                });
+                paginationContainer.appendChild(pageLink);
+            }
+
+            // '다음' 링크
+            if (currentPage < totalPages) {
+                const nextLink = document.createElement('a');
+                nextLink.textContent = '다음 >';
+                nextLink.href = '#';
+                nextLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    goToPage(currentPage + 1);
+                });
+                paginationContainer.appendChild(nextLink);
+            }
+        }
+
+        // 특정 페이지로 이동하는 함수
+        function goToPage(page) {
+            currentPage = page;
+            performSearch(currentSearchKeyword, currentPage, includeSponsored);
+        }
+
+        // 에러 표시
+        function showError(message) {
+            showSection('errorSection');
+            document.getElementById('errorText').textContent = message;
+        }
+
+        // 재시도 버튼 클릭 시
+        function retrySearch() {
+            if (currentSearchKeyword) {
+                performSearch(currentSearchKeyword, currentPage, includeSponsored);
+            } else {
+                showSection('searchMainInner'); // 검색 키워드가 없으면 검색 화면으로 돌아감
+            }
+        }
+    </script>
+</body>
+</html>
