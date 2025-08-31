@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>리뷰의 본질을 찾다</title>
     <style>
-        /* 기존 CSS 그대로 유지 */
+        /* 기존 CSS 그대로 복사 */
         @import url('https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.3.9/static/pretendard.css');
 
         .pretendard {
@@ -198,7 +198,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 4px;
+            gap: 1px;
             font-size: 14px;
             color: #aaa;
         }
@@ -206,14 +206,13 @@
         .blog__meta {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
             width: 100%;
         }
-
+        
         .blog__sponsor {
             color: #2DB400;
             font-size: 13px;
-            margin-left: auto;
         }
         
         .blog__date {
@@ -389,7 +388,7 @@
             <div class="main__inner2" id="resultsMainInner">
                 <div id="loadingSection" class="loading__section" style="display: none;">
                     <div class="loading__spinner"></div>
-                    <div class="loading__text">로딩중...</div>
+                    <div class="loading__text">로딩중</div>
                 </div>
                 <div id="errorSection" class="error__section" style="display: none;">
                     <div class="error__text" id="errorText">검색 중 오류가 발생했습니다.</div>
@@ -432,7 +431,6 @@
         let currentPage = 1;
         let includeSponsored = false;
         
-        // --- 화면 섹션 관리 함수 ---
         function showSection(sectionId) {
             document.getElementById('searchMainInner').style.display = 'none';
             document.getElementById('loadingSection').style.display = 'none';
@@ -452,11 +450,7 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            showSection('searchMainInner');
-        });
-
-        // 태그 클릭 검색 함수
+        // 태그 클릭 검색 함수 추가
         function searchTag(keyword) {
             document.getElementById('searchInput').value = keyword;
             currentPage = 1;
@@ -465,7 +459,10 @@
             performSearch(keyword, currentPage, includeSponsored);
         }
 
-        // 상단 검색 폼 제출 이벤트
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('searchMainInner');
+        });
+
         document.getElementById('searchForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const keyword = document.getElementById('searchInput').value.trim();
@@ -478,7 +475,6 @@
             }
         });
 
-        // 하단 검색 폼 제출 이벤트
         document.getElementById('footerSearchForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const keyword = document.getElementById('footerSearchInput').value.trim();
@@ -489,25 +485,20 @@
             }
         });
 
-        // '협찬글 포함' 체크박스 변경 이벤트
         document.getElementById('includeSponsoredCheckbox').addEventListener('change', function(e) {
             includeSponsored = e.target.checked;
             currentPage = 1;
             performSearch(currentSearchKeyword, currentPage, includeSponsored);
         });
 
-        // ✨ 실제 API를 호출하는 검색 함수
         async function performSearch(keyword, page, includeSponsored) {
             currentSearchKeyword = keyword;
-            
             showSection('loadingSection');
             
             try {
                 const response = await fetch('/api/search', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         keyword: keyword,
                         page: page,
@@ -522,13 +513,13 @@
                 } else {
                     showError(data.error || '검색 중 오류가 발생했습니다.');
                 }
+
             } catch (error) {
                 console.error('Search error:', error);
-                showError(`네트워크 오류가 발생했습니다: ${error.message}`);
+                showError(`검색 중 오류가 발생했습니다: ${error.message}`);
             }
         }
 
-        // 결과 표시 함수
         function displayResults(data) {
             showSection('resultsSection');
             
@@ -538,10 +529,7 @@
             const resultsSummary = document.getElementById('resultsSummary');
             resultsSummary.innerHTML = `
                 <div class="results__stats">
-                    총 검색된 게시물: ${data.results ? data.results.length : 0}개
-                    <br><small style="color: #2DB400; margin-top: 10px; display: block;">
-                        실제 네이버 블로그에서 검색된 결과입니다.
-                    </small>
+                    총 검색된 게시물: ${data.total_posts || 0}개 | 필터링된 협찬글: ${data.sponsored_count || 0}개
                 </div>
             `;
 
@@ -569,17 +557,15 @@
                     blogGrid.appendChild(blogCard);
                 });
             } else {
-                showError('해당 키워드로 찾은 게시물이 없거나 모두 협찬 글입니다.');
+                showError('검색 결과가 없습니다.');
             }
         }
 
-        // 에러 표시
         function showError(message) {
             showSection('errorSection');
             document.getElementById('errorText').textContent = message;
         }
 
-        // 재시도 버튼 클릭 시
         function retrySearch() {
             if (currentSearchKeyword) {
                 performSearch(currentSearchKeyword, currentPage, includeSponsored);
