@@ -11,8 +11,8 @@ app = Flask(__name__)
 CORS(app)
 
 # API 키
-client_id = os.environ.get('NAVER_CLIENT_ID')
-client_secret = os.environ.get('NAVER_CLIENT_SECRET')
+client_id = os.environ.get('jIlHrqsB4tITPcH7Syv2')
+client_secret = os.environ.get('utp07FFo8h')
 
 # 협찬 키워드 (더 포괄적으로)
 SPONSORSHIP_KEYWORDS = [
